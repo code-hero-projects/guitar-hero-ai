@@ -1,0 +1,9 @@
+{
+  "python.pythonPath": "C:\\Users\\Gonçalo\\AppData\\Local\\Programs\\Python\\Python39\\python.exe",
+  "python.autoComplete.extraPaths": [
+    "G:\\Documents\\videos\\coding-stuff\\guitar-hero-ai\\code\\src"
+  ],
+  "python.analysis.extraPaths": [
+    "G:\\Documents\\videos\\coding-stuff\\guitar-hero-ai\\code\\src"
+  ]
+}

@@ -19,12 +19,10 @@ def play(keys):
   key_location = KeyLocation(1180, 835, 30, 890)
   screenshot_number = 1
   while True:
-    threads = []
     image = get_screenshot(key_location)
     for key in keys:
       key_image = get_image_in_range(image, key.key_bound)
       thread = threading.Thread(target=thread_func, args=(key, key_image, screenshot_number), daemon=True)
-      threads.append(thread)
       thread.start()
     
     screenshot_number += 1

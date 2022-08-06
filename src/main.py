@@ -8,7 +8,6 @@ from keys.KeyLocation import KeyLocation
 from keys.OrangeKey import OrangeKey
 from keys.RedKey import RedKey
 from keys.YellowKey import YellowKey
-from process_image import get_image_in_range
 from screenshot import get_screenshot
 
 
@@ -21,8 +20,7 @@ def play(keys):
   while True:
     image = get_screenshot(key_location)
     for key in keys:
-      key_image = get_image_in_range(image, key.key_bound)
-      thread = threading.Thread(target=thread_func, args=(key, key_image, screenshot_number), daemon=True)
+      thread = threading.Thread(target=thread_func, args=(key, image, screenshot_number), daemon=True)
       thread.start()
       screenshot_number += 1
 

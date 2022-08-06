@@ -13,7 +13,7 @@ from keys.NoteTypeEnum import NoteTypeEnum
 
 class BaseKey:
   def __init__(self, key_bound: KeyBound, lower_bound_hsv: HSV, higher_bound_hsv: HSV, key_to_press: str, color: str) -> None:
-    self.key_bound = key_bound
+    self._key_bound = key_bound
     self._lower_bound_hsv = lower_bound_hsv
     self._upper_bound_hsv = higher_bound_hsv
     self._key_to_press = key_to_press
@@ -28,7 +28,8 @@ class BaseKey:
     cv2.imwrite(filename_mask, mask)
 
   def handle_screenshot(self, image, screenshot_number) -> bool:
-    mask = self._mask_image(image, self._lower_bound_hsv, self._upper_bound_hsv)
+    key_image = get_image_in_range(image, self._key_bound)
+    mask = self._mask_image(key_image, self._lower_bound_hsv, self._upper_bound_hsv)
     
     current_note = self._get_current_note(mask)
 
@@ -48,6 +49,15 @@ class BaseKey:
         self._press()
   
     self._previous_note = current_note
+
+  def get_image_in_range(image, key_bound: KeyBound):
+    pixels_rows = []
+
+    for pixel_line in image:
+      rows_to_append = pixel_line[key_bound.start:key_bound.end]
+      pixels_rows.append(rows_to_append)
+
+    return np.array(pixels_rows)
 
   def _press(self):
     if not self._key_pressed:

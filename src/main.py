@@ -1,6 +1,5 @@
 import threading
 import keyboard
-import numpy as np
 
 from keys.BlueKey import BlueKey
 from keys.GreenKey import GreenKey
@@ -8,7 +7,6 @@ from keys.KeyLocation import KeyLocation
 from keys.OrangeKey import OrangeKey
 from keys.RedKey import RedKey
 from keys.YellowKey import YellowKey
-from process_image import get_image_from_file, get_image_from_file_to_array
 from screenshot import get_screenshot
 
 

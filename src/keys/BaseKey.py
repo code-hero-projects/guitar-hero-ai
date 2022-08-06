@@ -42,7 +42,7 @@ class BaseKey:
     
     self._previous_note = current_note
 
-    self._save_image(screenshot_number, image, None)
+    # self._save_image(screenshot_number, image, None)
     # side_key = self._get_image_in_range(image, key_bound)
     
     # current_note = self._get_current_note(mask)
@@ -92,9 +92,9 @@ class BaseKey:
     #   return NoteTypeEnum.LINE
 
   def _is_in_bound(self, pixel):
-    red = pixel[0]
+    red = pixel[2]
     green = pixel[1]
-    blue = pixel[2]
+    blue = pixel[0]
 
     return self._lower_bound_rgb.red <= red <= self._upper_bound_rgb.red and\
       self._lower_bound_rgb.green <= green <= self._upper_bound_rgb.green and\

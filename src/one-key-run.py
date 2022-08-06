@@ -9,8 +9,8 @@ from keys.YellowKey import YellowKey
 from process_image import get_image_from_file
 
 def main():
-  key = RedKey()
-  image = np.array(get_image_from_file('note-72-red.png'))
+  key = GreenKey()
+  image = np.array(get_image_from_file('note-2620-orange.png'))
   key.handle_screenshot(image, 0)
 
 if __name__ == '__main__':

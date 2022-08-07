@@ -1,4 +1,5 @@
 import threading
+import time
 
 import keyboard
 
@@ -14,7 +15,15 @@ from screenshot import get_screenshot
 def thread_func(key, image, screenshot_number):
   key.handle_screenshot(image, screenshot_number)
 
+def activate_star_power():
+  while True:
+    keyboard.press('h')
+    time.sleep(1)
+
 def play(keys):
+  thread = threading.Thread(target=activate_star_power, daemon=True)
+  thread.start()
+
   key_location = KeyLocation(1180, 835, 30, 890)
   screenshot_number = 1
   while True:

@@ -1,10 +1,10 @@
 import threading
 import time
+from types import NoneType
 
 import cv2
 import keyboard
 import numpy as np
-from process_image import get_image_in_range
 
 from keys.HSV import HSV
 from keys.KeyBound import KeyBound
@@ -18,27 +18,30 @@ class BaseKey:
     self._upper_bound_hsv = higher_bound_hsv
     self._key_to_press = key_to_press
     self._color = color
+    self._lower_bound_hsv_star = HSV(90, 100, 100)
+    self._upper_bound_hsv_star = HSV(100, 255, 255)
     self._key_pressed = False
     self._previous_note = NoteTypeEnum.NONE
 
   def write_to_file(self, screenshot_number, image, mask):
     filename_image = f'note-{screenshot_number}-{self._color}.png'
-    filename_mask = f'note-{screenshot_number}-{self._color}-mask.png'
+    # filename_mask = f'note-{screenshot_number}-{self._color}-mask.png'
     cv2.imwrite(filename_image, image)
-    cv2.imwrite(filename_mask, mask)
+    # cv2.imwrite(filename_mask, mask)
 
   def handle_screenshot(self, image, screenshot_number) -> bool:
-    key_image = get_image_in_range(image, self._key_bound)
-    mask = self._mask_image(key_image, self._lower_bound_hsv, self._upper_bound_hsv)
+    key_image = self._get_image_in_range(image, self._key_bound)
+    current_note = self._get_note(key_image, self._lower_bound_hsv, self._upper_bound_hsv)
     
-    current_note = self._get_current_note(mask)
+    # if (current_note == NoteTypeEnum.NONE):
+    #   current_note = self._get_note(key_image, self._lower_bound_hsv_star, self._upper_bound_hsv_star)
 
-    # thread = threading.Thread(target=self.write_to_file, args=(screenshot_number, image, mask), daemon=True)
+    # thread = threading.Thread(target=self.write_to_file, args=(screenshot_number, key_image, None), daemon=True)
     # thread.start()
 
     if current_note == NoteTypeEnum.NONE:
       self._release()
-    elif current_note == NoteTypeEnum.SINGLE_NOTE:      
+    elif current_note == NoteTypeEnum.SINGLE_NOTE:
       if self._previous_note == NoteTypeEnum.NONE:
         self._press()
       elif self._previous_note == NoteTypeEnum.LINE:
@@ -50,7 +53,7 @@ class BaseKey:
   
     self._previous_note = current_note
 
-  def get_image_in_range(image, key_bound: KeyBound):
+  def _get_image_in_range(self, image, key_bound: KeyBound):
     pixels_rows = []
 
     for pixel_line in image:
@@ -59,15 +62,20 @@ class BaseKey:
 
     return np.array(pixels_rows)
 
-  def _press(self):
-    if not self._key_pressed:
-      keyboard.press(self._key_to_press)
-      self._key_pressed = True
-  
-  def _release(self):
-    if self._key_pressed:
-      keyboard.release(self._key_to_press)
-      self._key_pressed = False
+  def _get_note(self, image, lower_bound_hsv, upper_bound_hsv):
+    mask = self._mask_image(image, lower_bound_hsv, upper_bound_hsv)
+
+    if np.count_nonzero(mask) == 0:
+      return NoteTypeEnum.NONE
+    
+    note = self._get_image_in_range(mask, KeyBound(0, 30))
+    note_count = np.count_nonzero(note)
+    if note_count > 0:
+      return NoteTypeEnum.SINGLE_NOTE
+    else:
+      line = self._get_image_in_range(mask, KeyBound(80, 90))
+      note_count = np.count_nonzero(line)
+      return NoteTypeEnum.LINE
 
   def _mask_image(self, image, lower_bound_hsv: HSV, upper_bound_hsv: HSV):
     lower_bound = np.array([lower_bound_hsv.hue, lower_bound_hsv.saturation, lower_bound_hsv.value])
@@ -78,15 +86,12 @@ class BaseKey:
 
     return mask
 
-  def _get_current_note(self, mask):
-    if np.count_nonzero(mask) == 0:
-      return NoteTypeEnum.NONE
-    
-    note = get_image_in_range(mask, KeyBound(0, 30))
-    note_count = np.count_nonzero(note)
-    if note_count > 0:
-      return NoteTypeEnum.SINGLE_NOTE
-    else:
-      line = get_image_in_range(mask, KeyBound(80, 90))
-      note_count = np.count_nonzero(line)
-      return NoteTypeEnum.LINE
+  def _press(self):
+    if not self._key_pressed:
+      keyboard.press(self._key_to_press)
+      self._key_pressed = True
+  
+  def _release(self):
+    if self._key_pressed:
+      keyboard.release(self._key_to_press)
+      self._key_pressed = False

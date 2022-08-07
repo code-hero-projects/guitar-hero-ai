@@ -15,7 +15,7 @@ def thread_func(key, image, screenshot_number):
   key.handle_screenshot(image, screenshot_number)
 
 def play(keys):
-  key_location = KeyLocation(1180, 835, 60, 890)
+  key_location = KeyLocation(1180, 835, 30, 890)
   screenshot_number = 1
   while True:
     image = get_screenshot(key_location)

@@ -1,8 +1,8 @@
 from keys.BaseKey import BaseKey
-from keys.RGB import RGB
+from keys.HSV import HSV
 from keys.KeyBound import KeyBound
 
 
 class RedKey(BaseKey):
   def __init__(self) -> None:
-    super().__init__(KeyBound(180, 350), RGB(205, 0, 0), RGB(255, 28, 29), 'w', 'red')
+    super().__init__(KeyBound(180, 350), HSV(0, 209, 150), HSV(70, 255, 255), 'w', 'red')

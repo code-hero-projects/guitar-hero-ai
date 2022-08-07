@@ -1,6 +1,4 @@
 #finding hsv range of target object(pen)
-import time
-
 import cv2
 import numpy as np
 
@@ -21,23 +19,22 @@ cv2.namedWindow("Trackbars")
 # H,S and V channels. The Arguments are like this: Name of trackbar, 
 # window name, range,callback function. For Hue the range is 0-179 and
 # for S,V its 0-255.
-cv2.createTrackbar("L - H", "Trackbars", 0, 179, nothing)
-cv2.createTrackbar("L - S", "Trackbars", 0, 255, nothing)
-cv2.createTrackbar("L - V", "Trackbars", 0, 255, nothing)
-cv2.createTrackbar("U - H", "Trackbars", 179, 179, nothing)
+cv2.createTrackbar("L - H", "Trackbars", 19, 179, nothing)
+cv2.createTrackbar("L - S", "Trackbars", 168, 255, nothing)
+cv2.createTrackbar("L - V", "Trackbars", 60, 255, nothing)
+cv2.createTrackbar("U - H", "Trackbars", 45, 179, nothing)
 cv2.createTrackbar("U - S", "Trackbars", 255, 255, nothing)
 cv2.createTrackbar("U - V", "Trackbars", 255, 255, nothing)
  
+image_frame = cv2.imread('orange.png')
+    
+# Convert the BGR image to HSV image.
+image_hsv = cv2.cvtColor(image_frame, cv2.COLOR_BGR2HSV)
+
+sparkle_frame = cv2.imread('sparkle-1.png')
+sparkle_hsv = cv2.cvtColor(sparkle_frame, cv2.COLOR_BGR2HSV)
+
 while True:
-    
-    # Start reading the webcam feed frame by frame.
-    #ret, frame = cap.read()
-    # Flip the frame horizontally (Not required)
-    frame = cv2.imread('1-red.png')
-    
-    # Convert the BGR image to HSV image.
-    hsv = cv2.cvtColor(frame, cv2.COLOR_BGR2HSV)
-    
     # Get the new values of the trackbar in real time as the user changes 
     # them
     l_h = cv2.getTrackbarPos("L - H", "Trackbars")
@@ -54,20 +51,12 @@ while True:
     
     # Filter the image and get the binary mask, where white represents 
     # your target color
-    mask = cv2.inRange(hsv, lower_range, upper_range)
- 
-    # You can also visualize the real part of the target color (Optional)
-    res = cv2.bitwise_and(frame, frame, mask=mask)
-    
-    # Converting the binary mask to 3 channel image, this is just so 
-    # we can stack it with the others
-    mask_3 = cv2.cvtColor(mask, cv2.COLOR_GRAY2BGR)
-    
-    # stack the mask, orginal frame and the filtered result
-    stacked = np.hstack((mask_3,frame,res))
+    image_mask = cv2.inRange(image_hsv, lower_range, upper_range)
+    sparkle_mask = cv2.inRange(sparkle_hsv, lower_range, upper_range)
     
     # Show this stacked frame at 40% of the size.
-    cv2.imshow('Trackbars',cv2.resize(stacked,None,fx=0.4,fy=0.4))
+    cv2.imshow('image',cv2.resize(image_mask,None,fx=1.5,fy=1.5))
+    cv2.imshow('sparkle',cv2.resize(sparkle_mask,None,fx=1.5,fy=1.5))
     
     # If the user presses ESC then exit the program
     key = cv2.waitKey(1)

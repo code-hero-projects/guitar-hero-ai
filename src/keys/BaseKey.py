@@ -1,6 +1,5 @@
 import threading
 import time
-from types import NoneType
 
 import cv2
 import keyboard
@@ -23,20 +22,26 @@ class BaseKey:
     self._key_pressed = False
     self._previous_note = NoteTypeEnum.NONE
 
-  def write_to_file(self, screenshot_number, image, mask):
+  def write_to_file(self, screenshot_number, image, mask, star_mask):
     filename_image = f'note-{screenshot_number}-{self._color}.png'
-    # filename_mask = f'note-{screenshot_number}-{self._color}-mask.png'
     cv2.imwrite(filename_image, image)
-    # cv2.imwrite(filename_mask, mask)
+
+    filename_mask = f'note-{screenshot_number}-{self._color}-mask.png'
+    cv2.imwrite(filename_mask, mask)
+
+    filename_star_mask = f'note-{screenshot_number}-{self._color}-star-mask.png'
+    cv2.imwrite(filename_star_mask, star_mask)
 
   def handle_screenshot(self, image, screenshot_number) -> bool:
     key_image = self._get_image_in_range(image, self._key_bound)
     current_note = self._get_note(key_image, self._lower_bound_hsv, self._upper_bound_hsv)
     
-    # if (current_note == NoteTypeEnum.NONE):
-    #   current_note = self._get_note(key_image, self._lower_bound_hsv_star, self._upper_bound_hsv_star)
+    if (current_note == NoteTypeEnum.NONE):
+      current_note = self._get_note(key_image, self._lower_bound_hsv_star, self._upper_bound_hsv_star)
 
-    # thread = threading.Thread(target=self.write_to_file, args=(screenshot_number, key_image, None), daemon=True)
+    # mask = self._mask_image(key_image, self._lower_bound_hsv, self._upper_bound_hsv)
+    # star_mask = self._mask_image(key_image, self._lower_bound_hsv_star, self._upper_bound_hsv_star)
+    # thread = threading.Thread(target=self.write_to_file, args=(screenshot_number, key_image, mask, None), daemon=True)
     # thread.start()
 
     if current_note == NoteTypeEnum.NONE:
@@ -50,7 +55,7 @@ class BaseKey:
         # the code runs too fast so the game doesn't detect the release
         time.sleep(0.01)
         self._press()
-  
+
     self._previous_note = current_note
 
   def _get_image_in_range(self, image, key_bound: KeyBound):
@@ -64,7 +69,6 @@ class BaseKey:
 
   def _get_note(self, image, lower_bound_hsv, upper_bound_hsv):
     mask = self._mask_image(image, lower_bound_hsv, upper_bound_hsv)
-
     if np.count_nonzero(mask) == 0:
       return NoteTypeEnum.NONE
     

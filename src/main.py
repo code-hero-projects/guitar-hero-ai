@@ -9,7 +9,7 @@ from keys.KeyLocation import KeyLocation
 from keys.OrangeKey import OrangeKey
 from keys.RedKey import RedKey
 from keys.YellowKey import YellowKey
-from screenshot import get_screenshot
+from screenshot import get_screenshot  
 
 def play(keys):
   key_location = KeyLocation(1180, 835, 30, 890)
@@ -20,7 +20,8 @@ def play(keys):
       thread = threading.Thread(target=key.handle_screenshot, args=(image, screenshot_number), daemon=True)
       thread.start()
       screenshot_number += 1
-    # keyboard.press_and_release('h')
+      
+    keyboard.press_and_release('h')
 
 def main():
   print('press s to start')

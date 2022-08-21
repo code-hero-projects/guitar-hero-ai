@@ -11,8 +11,9 @@ from keys.NoteTypeEnum import NoteTypeEnum
 
 
 class BaseKey:
-  def __init__(self, key_bound: KeyBound, lower_bound_hsv: HSV, higher_bound_hsv: HSV, key_to_press: str, color: str) -> None:
+  def __init__(self, key_bound: KeyBound, note_key_bound: KeyBound, lower_bound_hsv: HSV, higher_bound_hsv: HSV, key_to_press: str, color: str) -> None:
     self._key_bound = key_bound
+    self._note_key_bound = note_key_bound
     self._lower_bound_hsv = lower_bound_hsv
     self._upper_bound_hsv = higher_bound_hsv
     self._key_to_press = key_to_press
@@ -23,25 +24,23 @@ class BaseKey:
     self._previous_note = NoteTypeEnum.NONE
 
   def write_to_file(self, screenshot_number, image, mask, star_mask):
-    filename_image = f'note-{screenshot_number}-{self._color}.png'
-    cv2.imwrite(filename_image, image)
+    if (self._color == 'red' or self._color == 'yellow'):
+      filename_image = f'note-{screenshot_number}-{self._color}.png'
+      cv2.imwrite(filename_image, image)
 
-    filename_mask = f'note-{screenshot_number}-{self._color}-mask.png'
-    cv2.imwrite(filename_mask, mask)
+      filename_mask = f'note-{screenshot_number}-{self._color}-mask.png'
+      cv2.imwrite(filename_mask, mask)
 
-    filename_star_mask = f'note-{screenshot_number}-{self._color}-star-mask.png'
-    cv2.imwrite(filename_star_mask, star_mask)
+      filename_star_mask = f'note-{screenshot_number}-{self._color}-star-mask.png'
+      cv2.imwrite(filename_star_mask, star_mask)
 
   def handle_screenshot(self, image, screenshot_number) -> bool:
     key_image = self._get_image_in_range(image, self._key_bound)
     current_note = self._get_note(key_image, self._lower_bound_hsv, self._upper_bound_hsv)
-    
-    if (current_note == NoteTypeEnum.NONE):
-      current_note = self._get_note(key_image, self._lower_bound_hsv_star, self._upper_bound_hsv_star)
 
     # mask = self._mask_image(key_image, self._lower_bound_hsv, self._upper_bound_hsv)
     # star_mask = self._mask_image(key_image, self._lower_bound_hsv_star, self._upper_bound_hsv_star)
-    # thread = threading.Thread(target=self.write_to_file, args=(screenshot_number, key_image, mask, None), daemon=True)
+    # thread = threading.Thread(target=self.write_to_file, args=(screenshot_number, key_image, mask, star_mask), daemon=True)
     # thread.start()
 
     if current_note == NoteTypeEnum.NONE:
@@ -68,17 +67,26 @@ class BaseKey:
     return np.array(pixels_rows)
 
   def _get_note(self, image, lower_bound_hsv, upper_bound_hsv):
-    mask = self._mask_image(image, lower_bound_hsv, upper_bound_hsv)
-    if np.count_nonzero(mask) == 0:
+    regular_note_mask = self._mask_image(image, lower_bound_hsv, upper_bound_hsv)
+    star_key_note_mask = self._mask_image(image, self._lower_bound_hsv_star, self._upper_bound_hsv_star)
+    regular_note_mask_count = np.count_nonzero(regular_note_mask)
+    star_note_mask_count = np.count_nonzero(star_key_note_mask)
+    
+    if regular_note_mask_count == 0 and star_note_mask_count == 0:
       return NoteTypeEnum.NONE
     
-    note = self._get_image_in_range(mask, KeyBound(0, 30))
-    note_count = np.count_nonzero(note)
-    if note_count > 0:
+    regular_note = self._get_image_in_range(regular_note_mask, self._note_key_bound)
+    regular_note_count = np.count_nonzero(regular_note)
+
+    if regular_note_count > 0:
+      return NoteTypeEnum.SINGLE_NOTE
+
+    star_key_note = self._get_image_in_range(star_key_note_mask, self._note_key_bound)
+    star_key_note_count = np.count_nonzero(star_key_note)
+    
+    if star_key_note_count > 0:
       return NoteTypeEnum.SINGLE_NOTE
     else:
-      line = self._get_image_in_range(mask, KeyBound(80, 90))
-      note_count = np.count_nonzero(line)
       return NoteTypeEnum.LINE
 
   def _mask_image(self, image, lower_bound_hsv: HSV, upper_bound_hsv: HSV):

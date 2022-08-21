@@ -5,4 +5,4 @@ from keys.KeyBound import KeyBound
 
 class RedKey(BaseKey):
   def __init__(self) -> None:
-    super().__init__(KeyBound(200, 350), HSV(0, 209, 150), HSV(70, 255, 255), 'w', 'red')
+    super().__init__(KeyBound(200, 340), KeyBound(110, 140), HSV(0, 190, 125), HSV(52, 255, 255), 'w', 'red')

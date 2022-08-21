@@ -19,19 +19,19 @@ cv2.namedWindow("Trackbars")
 # H,S and V channels. The Arguments are like this: Name of trackbar, 
 # window name, range,callback function. For Hue the range is 0-179 and
 # for S,V its 0-255.
-cv2.createTrackbar("L - H", "Trackbars", 24, 179, nothing)
-cv2.createTrackbar("L - S", "Trackbars", 149, 255, nothing)
-cv2.createTrackbar("L - V", "Trackbars", 63, 255, nothing)
-cv2.createTrackbar("U - H", "Trackbars", 50, 179, nothing)
+cv2.createTrackbar("L - H", "Trackbars", 0, 179, nothing)
+cv2.createTrackbar("L - S", "Trackbars", 0, 255, nothing)
+cv2.createTrackbar("L - V", "Trackbars", 0, 255, nothing)
+cv2.createTrackbar("U - H", "Trackbars", 179, 179, nothing)
 cv2.createTrackbar("U - S", "Trackbars", 255, 255, nothing)
 cv2.createTrackbar("U - V", "Trackbars", 255, 255, nothing)
  
-image_frame = cv2.imread('note-2353-yellow.png')
+image_frame = cv2.imread('note-1058-yellow.png')
     
 # Convert the BGR image to HSV image.
 image_hsv = cv2.cvtColor(image_frame, cv2.COLOR_BGR2HSV)
 
-other_frame = cv2.imread('red-line.png')
+other_frame = cv2.imread('note-1063-yellow.png')
 other_hsv = cv2.cvtColor(other_frame, cv2.COLOR_BGR2HSV)
 
 while True:

@@ -17,9 +17,9 @@ def play(keys):
   while True:
     image = get_screenshot(key_location)
     for key in keys:
-      key.handle_screenshot(image, screenshot_number)
-      # thread = threading.Thread(target=key.handle_screenshot, args=(image, screenshot_number), daemon=True)
-      # thread.start()
+      # key.handle_screenshot(image, screenshot_number)
+      thread = threading.Thread(target=key.handle_screenshot, args=(image, screenshot_number), daemon=True)
+      thread.start()
       screenshot_number += 1
       
     keyboard.press_and_release('h')

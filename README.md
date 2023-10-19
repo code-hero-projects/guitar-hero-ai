@@ -1,4 +1,4 @@
-# Guitar Hero Ai
+# Guitar Hero AI
 
 This project is a bot that can play Clone Hero, which is a game that emulates Guitar Hero for PC.
 
